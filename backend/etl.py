@@ -163,6 +163,9 @@ def run_etl(raw_csv_path: str = RAW_CSV_PATH, db_path: str = DB_PATH) -> Dict[st
     return summary
 
 def get_audit_log() -> List[Dict[str, Any]]:
+    global AUDIT_LOG
+    if not AUDIT_LOG:
+        run_etl()
     return AUDIT_LOG
 
 if __name__ == "__main__":

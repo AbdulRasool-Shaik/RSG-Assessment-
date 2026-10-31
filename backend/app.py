@@ -123,13 +123,18 @@ def get_config():
 
 @app.get("/api/health", response_model=DataHealthResponse, summary="Get database health and ETL audit log")
 def get_health():
-    """Returns database connection status, schema information, and data cleaning audit logs."""
     try:
-        cols, rows, _ = execute_safe_query(DB_PATH, "SELECT COUNT(*) as count FROM sales")
-        total = rows[0]["count"] if rows else 0
+        import sqlite3
+        conn = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) as count FROM sales")
+        total = cursor.fetchone()["count"]
         
-        cols_info, schema_rows, _ = execute_safe_query(DB_PATH, "PRAGMA table_info(sales)")
+        cursor.execute("PRAGMA table_info(sales)")
+        schema_rows = cursor.fetchall()
         schema_list = [{"name": r["name"], "type": r["type"]} for r in schema_rows] if schema_rows else []
+        conn.close()
         
         audit_items = [AuditItem(**item) for item in get_audit_log()]
         
