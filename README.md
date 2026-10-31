@@ -163,6 +163,19 @@ Executes natural language sales question.
 }
 ```
 
+## ⚠️ Known Limitations
+
+In compliance with the challenge documentation guidelines, the following known limitations and architectural boundaries of this prototype are documented:
+
+1. **Single-Table Analytical Scope:**
+   - The current SQLite database models a single denormalized analytical table (`sales`). While ideal for transactional sales reporting, an enterprise deployment would model snowflake schemas with normalized dimension tables (`customers`, `warehouses`, `promotions`).
+2. **Deterministic Offline Fallback Boundary:**
+   - The zero-API-key deterministic engine supports the 5 core benchmark questions, date variances, volume analytics, and category/channel breakdowns. Arbitrary or deeply nested ad-hoc questions (e.g., *"Calculate the median order value for online retail in Q1 excluding Mondays"*) require an active LLM API key (`OPENAI_API_KEY` or `GEMINI_API_KEY`) for dynamic Text-to-SQL compilation.
+3. **Language & Locale Localization:**
+   - Intent recognition and date-month parsing are currently localized for English (`January`–`June`, `Q1`, `Q2`). Multilingual support would require a multilingual semantic embedding layer.
+4. **OLAP Concurrency vs. Distributed Scale:**
+   - SQLite with read-only connection sandboxing provides sub-2ms query latency for thousands of transactions. For petabyte-scale big data analytics, migrating to a columnar data warehouse like **ClickHouse**, **Snowflake**, or **Amazon Redshift** is recommended.
+
 ---
 
 ## 🛡️ Security Policies Enforced

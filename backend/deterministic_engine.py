@@ -45,25 +45,25 @@ class DeterministicEngine:
                 explanation="The request contained forbidden DDL/DML mutation keywords."
             )
 
-        # 1. Total Revenue Query
-        if self._matches_total_revenue(q):
-            return self._handle_total_revenue(query)
+        # 1. Month-over-Month Comparison Query (Prioritized before generic month queries)
+        if self._matches_month_comparison(q):
+            return self._handle_month_comparison(query, q)
 
-        # 2. Product Revenue / Highest Product Query
-        if self._matches_product_revenue(q):
-            return self._handle_product_revenue(query)
+        # 2. Regional Sales / Highest Region Query (Prioritized before generic revenue queries)
+        if self._matches_regional_sales(q):
+            return self._handle_regional_sales(query)
 
         # 3. Monthly Revenue Trend Query
         if self._matches_monthly_trend(q):
             return self._handle_monthly_trend(query)
 
-        # 4. Regional Sales / Highest Region Query
-        if self._matches_regional_sales(q):
-            return self._handle_regional_sales(query)
+        # 4. Product Revenue / Highest Product Query
+        if self._matches_product_revenue(q):
+            return self._handle_product_revenue(query, q)
 
-        # 5. Month-over-Month Comparison Query
-        if self._matches_month_comparison(q):
-            return self._handle_month_comparison(query, q)
+        # 5. Total Revenue Query
+        if self._matches_total_revenue(q):
+            return self._handle_total_revenue(query)
 
         # 6. Category Breakdown
         if 'category' in q:
@@ -148,9 +148,17 @@ class DeterministicEngine:
         )
 
     def _matches_product_revenue(self, q: str) -> bool:
-        return 'product' in q or 'highest revenue' in q or 'best selling' in q or 'top product' in q
+        if any(r in q for r in ['region', 'territory', 'location', 'area', 'zone']):
+            return False
+        return (
+            'product' in q or 'highest revenue' in q or 'best selling' in q 
+            or 'top product' in q or 'most sold' in q or 'units sold' in q or 'item' in q
+        )
 
-    def _handle_product_revenue(self, query: str) -> QueryResponse:
+    def _handle_product_revenue(self, query: str, q: str = "") -> QueryResponse:
+        is_volume_query = any(k in q for k in ['quantity', 'units', 'most sold', 'volume']) and not any(r in q for r in ['revenue', 'money', 'dollar', 'income'])
+        order_clause = "units_sold DESC" if is_volume_query else "total_net_revenue DESC"
+
         sql = (
             "SELECT "
             "product, "
@@ -160,7 +168,7 @@ class DeterministicEngine:
             "FROM sales "
             "WHERE status = 'Completed' "
             "GROUP BY product "
-            "ORDER BY total_net_revenue DESC"
+            f"ORDER BY {order_clause}"
         )
         cols, rows, exec_time = execute_safe_query(self.db_path, sql)
         top = rows[0] if rows else {}
@@ -169,28 +177,38 @@ class DeterministicEngine:
         top_rev = top.get('total_net_revenue', 0.0)
         top_units = top.get('units_sold', 0)
 
-        answer = (
-            f"### Highest Revenue Product: **{top_prod}**\n\n"
-            f"The product that generated the highest revenue is the **{top_prod}**, producing **${top_rev:,.2f}** "
-            f"in net revenue across **{top_units} units sold** ({top.get('order_count', 0)} transactions).\n\n"
-            f"#### Full Product Revenue Ranking:\n"
-        )
-        for i, r in enumerate(rows, 1):
-            answer += f"{i}. **{r['product']}**: ${r['total_net_revenue']:,.2f} ({r['units_sold']} units)\n"
+        if is_volume_query:
+            answer = (
+                f"### Highest Volume Product: **{top_prod}**\n\n"
+                f"The product with the highest sales volume is the **{top_prod}**, with **{top_units} units sold** "
+                f"generating **${top_rev:,.2f}** in net revenue across {top.get('order_count', 0)} completed orders.\n\n"
+                f"#### Full Product Volume Ranking:\n"
+            )
+            for i, r in enumerate(rows, 1):
+                answer += f"{i}. **{r['product']}**: {r['units_sold']} units (${r['total_net_revenue']:,.2f})\n"
+        else:
+            answer = (
+                f"### Highest Revenue Product: **{top_prod}**\n\n"
+                f"The product that generated the highest revenue is the **{top_prod}**, producing **${top_rev:,.2f}** "
+                f"in net revenue across **{top_units} units sold** ({top.get('order_count', 0)} transactions).\n\n"
+                f"#### Full Product Revenue Ranking:\n"
+            )
+            for i, r in enumerate(rows, 1):
+                answer += f"{i}. **{r['product']}**: ${r['total_net_revenue']:,.2f} ({r['units_sold']} units)\n"
 
         metrics = [
-            MetricCard(label="Top Product", value=top_prod, subtitle=f"${top_rev:,.2f}"),
+            MetricCard(label="Top Product", value=top_prod, subtitle=f"${top_rev:,.2f}" if not is_volume_query else f"{top_units} Units"),
             MetricCard(label="Units Sold", value=str(top_units), subtitle="Total Volume"),
             MetricCard(label="Total Products", value=str(len(rows)), subtitle="In Catalog")
         ]
 
         chart = ChartData(
             chart_type="bar",
-            title="Net Revenue by Product ($)",
+            title="Net Revenue by Product ($)" if not is_volume_query else "Units Sold by Product",
             labels=[r['product'] for r in rows],
             datasets=[{
-                "label": "Net Revenue ($)",
-                "data": [r['total_net_revenue'] for r in rows],
+                "label": "Net Revenue ($)" if not is_volume_query else "Units Sold",
+                "data": [r['total_net_revenue'] if not is_volume_query else r['units_sold'] for r in rows],
                 "backgroundColor": "rgba(59, 130, 246, 0.7)",
                 "borderColor": "rgba(59, 130, 246, 1.0)",
                 "borderWidth": 1
@@ -209,11 +227,13 @@ class DeterministicEngine:
             metrics=metrics,
             chart=chart,
             engine_used="deterministic_semantic_engine",
-            explanation="Aggregated net revenue by product for completed orders and ranked in descending order."
+            explanation=f"Aggregated sales metrics by product for completed orders and ranked by {order_clause}."
         )
 
     def _matches_monthly_trend(self, q: str) -> bool:
-        return 'monthly' in q or 'trend' in q or ('month' in q and not any(m in q for m in ['between', 'compare', 'from']))
+        if any(m in q for m in ['between', 'compare', 'change', 'growth', 'vs', 'versus']):
+            return False
+        return 'monthly' in q or 'trend' in q or 'over time' in q or 'timeline' in q or 'month' in q
 
     def _handle_monthly_trend(self, query: str) -> QueryResponse:
         sql = (
@@ -279,7 +299,7 @@ class DeterministicEngine:
         )
 
     def _matches_regional_sales(self, q: str) -> bool:
-        return 'region' in q or 'territory' in q or 'location' in q
+        return any(k in q for k in ['region', 'territory', 'location', 'area', 'zone', 'north', 'south', 'east', 'west'])
 
     def _handle_regional_sales(self, query: str) -> QueryResponse:
         sql = (
@@ -347,7 +367,11 @@ class DeterministicEngine:
         )
 
     def _matches_month_comparison(self, q: str) -> bool:
-        return 'between' in q or 'change between' in q or 'compare' in q or 'growth' in q
+        return (
+            'between' in q or 'change between' in q or 'compare' in q 
+            or 'growth' in q or 'vs' in q or 'versus' in q
+            or (('month' in q or 'monthly' in q) and any(m in q for m in ['change', 'diff', 'variance']))
+        )
 
     def _handle_month_comparison(self, query: str, q: str) -> QueryResponse:
         # Detect target months in query
