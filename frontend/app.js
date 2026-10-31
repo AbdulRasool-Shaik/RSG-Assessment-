@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Initialize API Key from localStorage
     initApiKey();
 
-    function initApiKey() {
+    async function initApiKey() {
         const savedKey = localStorage.getItem('gemini_api_key');
         const savedModel = localStorage.getItem('gemini_model');
         if (savedModel && geminiModelSelect) {
@@ -44,9 +44,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (savedKey) {
             geminiKeyInput.value = savedKey;
             setKeyStatus(true, `🟢 Gemini Live (${savedModel || '1.5 Flash'})`);
-        } else {
-            setKeyStatus(false, 'Connect Gemini AI');
+            return;
         }
+
+        // Check backend server config (.env)
+        try {
+            const res = await fetch('/api/config');
+            const cfg = await res.json();
+            if (cfg.backend_has_key) {
+                setKeyStatus(true, `🟢 Backend AI Active (${cfg.default_model})`);
+                if (keyVerificationMsg) {
+                    keyVerificationMsg.textContent = 'Backend .env API key active. You can override with a custom key below.';
+                    keyVerificationMsg.className = 'verification-msg success';
+                }
+                return;
+            }
+        } catch (e) {
+            // Silently proceed
+        }
+
+        setKeyStatus(false, 'Connect Gemini AI');
     }
 
     function setKeyStatus(isOnline, text) {

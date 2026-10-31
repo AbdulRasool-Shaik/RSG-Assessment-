@@ -90,15 +90,9 @@ def run_etl(raw_csv_path: str = RAW_CSV_PATH, db_path: str = DB_PATH) -> Dict[st
     df.to_csv(CLEANED_CSV_PATH, index=False)
     
     # 7. Load into SQLite Database with Strict Typing & Indexes
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
-    if os.path.exists(db_path):
-        try:
-            os.remove(db_path)
-        except Exception:
-            pass
-
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
+    cursor.execute("DROP TABLE IF EXISTS sales;")
     
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS sales (

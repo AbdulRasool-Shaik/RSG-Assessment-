@@ -10,6 +10,7 @@ import re
 import json
 import logging
 import requests
+import sqlparse
 from typing import Optional, Dict, Any, List, Tuple
 from .security import validate_sql_query, execute_safe_query, SecurityValidationError
 from .models import QueryResponse, MetricCard, ChartData
@@ -295,6 +296,11 @@ class AgenticQueryCoordinator:
         return parts[0].get("text", "")
 
     def _clean_sql(self, sql_str: str) -> str:
-        clean = re.sub(r'```sql\s*|\s*```', '', sql_str).strip()
+        clean = sql_str.strip()
+        # Strip any code fence like ```sql, ```sqlite, ```
+        clean = re.sub(r'^```[a-zA-Z]*\s*', '', clean)
+        clean = re.sub(r'\s*```$', '', clean).strip()
+        # Strip comments safely
+        clean = sqlparse.format(clean, strip_comments=True).strip()
         clean = clean.rstrip(';').strip()
         return clean

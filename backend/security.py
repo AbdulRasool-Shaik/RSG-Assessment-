@@ -38,6 +38,9 @@ def validate_sql_query(sql: str) -> bool:
 
     clean_sql = sql.strip().rstrip(';').strip()
 
+    # Safely strip SQL comments so benign LLM annotations don't cause false rejections
+    clean_sql = sqlparse.format(clean_sql, strip_comments=True).strip()
+
     # Disallow multiple semicolons (stacked query injection)
     if ';' in clean_sql:
         raise SecurityValidationError(
@@ -74,12 +77,6 @@ def validate_sql_query(sql: str) -> bool:
             raise SecurityValidationError(
                 f"Destructive keyword '{val}' is strictly forbidden by security policy."
             )
-
-    # Check for suspicious comment injections (-- or /* */)
-    if re.search(r'(--|/\*|\*/)', clean_sql):
-        raise SecurityValidationError(
-            "SQL comments are not permitted in user queries to prevent filter evasion."
-        )
 
     return True
 

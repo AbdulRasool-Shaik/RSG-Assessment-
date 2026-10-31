@@ -104,6 +104,17 @@ def verify_api_key(payload: Dict[str, str]):
     except Exception as e:
         return {"valid": False, "message": f"Connection error: {str(e)}"}
 
+@app.get("/api/config", summary="Get backend AI configuration status")
+def get_config():
+    """Returns backend configuration including whether GEMINI_API_KEY is active in .env."""
+    has_key = bool(os.getenv("GEMINI_API_KEY", "").strip())
+    model = os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip()
+    return {
+        "backend_has_key": has_key,
+        "default_model": model,
+        "status": "ready"
+    }
+
 @app.get("/api/health", response_model=DataHealthResponse, summary="Get database health and ETL audit log")
 def get_health():
     """Returns database connection status, schema information, and data cleaning audit logs."""
