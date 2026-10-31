@@ -156,3 +156,31 @@ def test_verify_api_key_endpoint():
     res_fake = client.post("/api/verify-key", json={"api_key": "fake_test_key_12345"})
     assert res_fake.status_code == 200
     assert res_fake.json()["valid"] is False
+
+def test_health_endpoint():
+    """Verifies that the /api/health endpoint returns healthy status and ETL audit trail."""
+    res = client.get("/api/health")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "healthy"
+    assert data["total_records"] == 51
+    assert len(data["audit_log"]) >= 3
+    assert any(item["transaction_id"] == "TXN0051" for item in data["audit_log"])
+
+def test_channel_breakdown():
+    """Verifies that sales channel comparison executes deterministically."""
+    res = client.post("/api/query", json={"query": "Compare sales between Online and Retail channels", "use_llm": False})
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "success"
+    assert len(data["data"]) == 2
+    channels = {r["sales_channel"] for r in data["data"]}
+    assert "Online" in channels and "Retail" in channels
+
+def test_config_endpoint():
+    """Verifies that /api/config returns ready status and active model."""
+    res = client.get("/api/config")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "ready"
+    assert "default_model" in data

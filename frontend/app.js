@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsSection.classList.add('hidden');
 
         const activeKey = localStorage.getItem('gemini_api_key') || geminiKeyInput.value.trim();
-        const selectedModel = geminiModelSelect ? geminiModelSelect.value : 'gemini-1.5-flash';
+        const selectedModel = geminiModelSelect ? geminiModelSelect.value : 'gemini-2.5-flash';
 
         try {
             const res = await fetch('/api/query', {
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const liveModelBadge = document.getElementById('live-model-badge');
 
         // Check if processed by Live Gemini or Fallback
-        const isLive = data.live_model && !data.live_model.includes('None') && !data.live_model.includes('Failed');
+        const isLive = data.live_model && !data.live_model.includes('None') && !data.live_model.includes('Failed') && !data.live_model.includes('Rate Limited');
 
         if (isLive) {
             engineBadge.textContent = 'AGENTIC VECTORLESS RAG';
@@ -239,6 +239,9 @@ document.addEventListener('DOMContentLoaded', () => {
             engineBadge.style.color = '#93c5fd';
 
             liveModelBadge.textContent = `🟢 LIVE: ${data.live_model.replace('(Live)', '').trim()}`;
+            liveModelBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+            liveModelBadge.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+            liveModelBadge.style.color = '#6ee7b7';
             liveModelBadge.classList.remove('hidden');
         } else {
             engineBadge.textContent = 'DETERMINISTIC FALLBACK ENGINE';
@@ -246,10 +249,17 @@ document.addEventListener('DOMContentLoaded', () => {
             engineBadge.style.borderColor = 'rgba(245, 158, 11, 0.35)';
             engineBadge.style.color = '#fcd34d';
 
-            liveModelBadge.textContent = 'OFFLINE (NO API KEY)';
-            liveModelBadge.style.background = 'rgba(107, 114, 128, 0.15)';
-            liveModelBadge.style.borderColor = 'rgba(107, 114, 128, 0.3)';
-            liveModelBadge.style.color = '#9ca3af';
+            if (data.live_model && data.live_model.includes('Rate Limited')) {
+                liveModelBadge.textContent = '⚡ RATE LIMITED (ZERO-DOWNTIME FALLBACK)';
+                liveModelBadge.style.background = 'rgba(245, 158, 11, 0.15)';
+                liveModelBadge.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+                liveModelBadge.style.color = '#fcd34d';
+            } else {
+                liveModelBadge.textContent = 'OFFLINE (NO API KEY)';
+                liveModelBadge.style.background = 'rgba(107, 114, 128, 0.15)';
+                liveModelBadge.style.borderColor = 'rgba(107, 114, 128, 0.3)';
+                liveModelBadge.style.color = '#9ca3af';
+            }
             liveModelBadge.classList.remove('hidden');
         }
 
