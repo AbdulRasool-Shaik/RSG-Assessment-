@@ -1,10 +1,35 @@
+# Python & Virtual Environments
 __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
-.env
 venv/
 .venv/
-extracted_zip/
+env/
 *.log
+
+# Sensitive Credentials
+.env
+.env.local
+
+# Archives & Source Deliverable Zips
+*.zip
+*.tar.gz
+*.rar
+extracted_zip/
+
+# Raw Challenge Prompt Files (kept locally)
+AI Assisted Development Challenge - GET.docx
+
+# Office Temporary Lock Files & Local Copies
 ~$*.docx
+~$*.xlsx
+submission_pack/*_Abdul_Rasool.docx
+
+# IDE & OS Artifacts
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

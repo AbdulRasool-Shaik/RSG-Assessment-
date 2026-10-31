@@ -151,6 +151,44 @@ python -m pytest tests/test_assistant.py -v
 
 To maintain strict separation between official grading deliverables and candidate interview preparation materials, documentation is organized into two dedicated directories:
 
+```text
+mini-ai-bi-assistant/
+├── .env.example              # Sample environment configuration
+├── .gitignore                # Production ignore rules
+├── README.md                 # Master documentation & quickstart
+├── requirements.txt          # Python dependencies
+├── backend/                  # Production FastAPI backend
+│   ├── app.py                # ASGI application & REST routes
+│   ├── deterministic_engine.py # Zero-downtime offline semantic engine
+│   ├── etl.py                # Data imputation & ISO-8601 normalization
+│   ├── llm_agent.py          # Gemini 2.5 Flash agentic Text-to-SQL
+│   ├── models.py             # Pydantic v2 domain schemas
+│   └── security.py           # AST token security validator (sqlparse)
+├── frontend/                 # Zero-build responsive executive dashboard
+│   ├── index.html            # Semantic HTML5 UI
+│   ├── style.css             # Vanilla CSS glassmorphic theme
+│   └── app.js                # Chart.js visualizations & state
+├── data/                     # Analytical data store
+│   ├── ai_bi_assistant_sales_data - GET.csv  # Raw sales transactions
+│   ├── cleaned_sales_data.csv               # Normalized dataset
+│   └── sales_bi.db                          # Indexed SQLite database
+├── tests/                    # Automated pytest test suite
+│   └── test_assistant.py     # 16 unit, integration & security tests
+├── submission_pack/          # 📋 Official Evaluator Submission Deliverables
+│   ├── README.md             # Submission landing page
+│   ├── SUBMISSION_OVERVIEW.md# Executive summary & compliance matrix
+│   ├── AI_ASSISTED_DEVELOPMENT_REPORT.md # 5 challenge assessment answers
+│   ├── SYSTEM_ARCHITECTURE.md# Architecture diagram & security boundaries
+│   ├── BENCHMARK_RESULTS.md  # Ground truth verified numbers ($1,445,200.00)
+│   └── SUBMISSION_CHECKLIST.md # Requirements compliance checklist
+└── interview_preparation/    # 🎓 Candidate Private Defense & Study Kit
+    ├── README.md             # Preparation kit overview & schedule
+    ├── INTERVIEW_PREP_PLAYBOOK.md # 25+ technical Q&As across 5 categories
+    ├── ARCHITECTURAL_DECISIONS_ADR.md # 10 Architectural Decision Records
+    ├── CORE_CONCEPTS_CHEATSHEET.md # Agentic AI, RAG, & AWS Cloud
+    └── LIVE_DEMO_SCRIPT.md   # Step-by-step interview presentation runbook
+```
+
 ### 📂 1. Official Evaluator Submission Pack (`submission_pack/`)
 *Delivered for evaluator review and assessment grading against `AI Assisted Development Challenge - GET.docx`:*
 - **[submission_pack/SUBMISSION_OVERVIEW.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/submission_pack/SUBMISSION_OVERVIEW.md)**: Executive summary, requirements matrix, 60-second quickstart, and feature highlights.
