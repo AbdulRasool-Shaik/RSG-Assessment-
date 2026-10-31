@@ -1,8 +1,9 @@
 # Architectural Decision Records (ADR Log)
 
 **Project:** Mini AI Business Intelligence Assistant  
-**Author:** Principal AI & Backend Systems Engineer  
-**Role:** Graduate Engineer Trainee Selection — RSG  
+**Candidate:** Tharun Parsa  
+**Target Role:** Graduate Engineer Trainee (Python with Generative AI Engineer) — RSG  
+**Reporting Manager / Evaluator:** Jeevan Kumar, RSG, Hyderabad  
 **Date:** October 2026  
 
 ---
@@ -105,7 +106,7 @@ We chose **Modal Catalog Price Imputation ($1200.0) with an Automated Audit Trai
 ## ADR-005: Dual-Mode Execution Architecture (Agentic LLM + Deterministic Fallback)
 
 ### Context & Problem Statement
-Evaluators testing candidates' repositories often clone the project on machines without active API keys (or with restricted internet access). If an app immediately fails on launch due to a missing `OPENAI_API_KEY`, it fails the "Working Functionality" evaluation rubric.
+Evaluators testing candidates' repositories often clone the project on machines without active API keys (or with restricted internet access). If an app immediately fails on launch due to a missing `GEMINI_API_KEY`, it fails the "Working Functionality" evaluation rubric.
 
 ### Alternatives Considered
 1. **LLM-Only:** Require an active API key; crash or error out if not present.
@@ -194,7 +195,7 @@ Additionally, Google AI Studio Free Tier enforces a strict quota of 5 requests p
 
 ### Decision
 We implemented a **Backend-First `.env` Architecture with Dynamic UI Override and Zero-Downtime Deterministic Fallback**:
-1. Server automatically loads `GEMINI_API_KEY` from [.env](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/.env) using `load_dotenv(override=True)`.
+1. Server automatically loads `GEMINI_API_KEY` from `.env` using `load_dotenv(override=True)`.
 2. Evaluators can optionally override the active key directly in the web UI without modifying configuration files.
 3. If Google AI Studio returns an HTTP 429 quota exception or network error, the **Agentic Coordinator** intercepts the exception and seamlessly falls back to the **Deterministic Semantic Engine**, returning the 100% accurate ground truth result in < 2ms with an explicit status badge: `⚡ RATE LIMITED (ZERO-DOWNTIME FALLBACK)`.
 
@@ -202,4 +203,3 @@ We implemented a **Backend-First `.env` Architecture with Dynamic UI Override an
 - **Security & Best Practice:** Storing credentials in `.env` (which is strictly gitignored) adheres to 12-factor application security principles.
 - **Evaluator Flexibility:** An evaluator can either paste their own key in the browser or run the project out-of-the-box without touching anything.
 - **High Availability (Zero Downtime):** Real-world enterprise AI systems must never fail with an unhandled 500 error when third-party LLM providers rate-limit. The deterministic fallback guarantees 100% uptime and mathematical accuracy at all times.
-

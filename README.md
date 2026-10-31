@@ -145,15 +145,24 @@ python -m pytest tests/test_assistant.py -v
 
 ---
 
-## 📚 Complete Project Documentation
+## 📚 Project Documentation & Organization
 
-| Document | Description |
-| :--- | :--- |
-| **[docs/SUBMISSION_PACKAGE.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/docs/SUBMISSION_PACKAGE.md)** | **Master Submission Package**: Executive summary, requirements compliance matrix, evaluator guide, and ground truth benchmarks. |
-| **[docs/AI_ASSISTED_DEVELOPMENT_REPORT.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/docs/AI_ASSISTED_DEVELOPMENT_REPORT.md)** | **Mandatory Assessment Deliverable**: Answers the 5 assessment questions regarding AI tools, debugging, and roadmap. |
-| **[docs/INTERVIEW_PREP_GUIDE.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/docs/INTERVIEW_PREP_GUIDE.md)** | **Your Interview Playbook**: 60s elevator pitch, 3-min walkthrough, live demo script, and 25+ technical Q&As. |
-| **[docs/DECISIONS_LOG.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/docs/DECISIONS_LOG.md)** | **Architectural Decision Records (ADRs)**: Detailed justifications and trade-off analysis for 10 key technical decisions. |
-| **[docs/ARCHITECTURE.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/docs/ARCHITECTURE.md)** | **Technical Specification**: Mermaid diagrams, component boundaries, and security model. |
+To maintain strict separation between official grading deliverables and candidate interview preparation materials, documentation is organized into two dedicated directories:
+
+### 📂 1. Official Evaluator Submission Pack (`submission_pack/`)
+*Delivered for evaluator review and assessment grading against `AI Assisted Development Challenge - GET.docx`:*
+- **[submission_pack/SUBMISSION_OVERVIEW.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/submission_pack/SUBMISSION_OVERVIEW.md)**: Executive summary, requirements matrix, 60-second quickstart, and feature highlights.
+- **[submission_pack/AI_ASSISTED_DEVELOPMENT_REPORT.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/submission_pack/AI_ASSISTED_DEVELOPMENT_REPORT.md)**: **Mandatory Assessment Deliverable** answering the 5 evaluation questions (AI tools, phases, 6 technical problems & fixes, debugging methods, and 5 roadmap items).
+- **[submission_pack/SYSTEM_ARCHITECTURE.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/submission_pack/SYSTEM_ARCHITECTURE.md)**: Technical architecture specification, Mermaid diagrams, component boundaries, and 5-layer security model.
+- **[submission_pack/BENCHMARK_RESULTS.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/submission_pack/BENCHMARK_RESULTS.md)**: Ground truth benchmark table with verified figures ($1,445,200.00 Net Revenue), executed SQL queries, and accounting rationale.
+- **[submission_pack/SUBMISSION_CHECKLIST.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/submission_pack/SUBMISSION_CHECKLIST.md)**: Line-by-line verification against all criteria in the challenge document.
+
+### 📂 2. Candidate Interview Preparation Kit (`interview_preparation/`)
+*Dedicated candidate study guides, interview defense materials, and live screen-share walkthroughs:*
+- **[interview_preparation/INTERVIEW_PREP_PLAYBOOK.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/interview_preparation/INTERVIEW_PREP_PLAYBOOK.md)**: Candidate interview playbook containing 60s elevator pitch, 3-min architectural deep dive, and 25 comprehensive technical Q&As across 5 categories.
+- **[interview_preparation/ARCHITECTURAL_DECISIONS_ADR.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/interview_preparation/ARCHITECTURAL_DECISIONS_ADR.md)**: 10 Architectural Decision Records (ADRs) detailing problem statements, alternatives, and trade-offs.
+- **[interview_preparation/CORE_CONCEPTS_CHEATSHEET.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/interview_preparation/CORE_CONCEPTS_CHEATSHEET.md)**: Deep dive on Agentic AI vs Generative AI, Vectorless RAG vs Vector RAG, LangChain/LangGraph, Google ADK, Dify, and AWS Cloud scaling.
+- **[interview_preparation/LIVE_DEMO_SCRIPT.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/interview_preparation/LIVE_DEMO_SCRIPT.md)**: Step-by-step interview presentation checklist and screen-sharing runbook.
 
 ---
 

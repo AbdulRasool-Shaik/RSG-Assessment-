@@ -1,7 +1,8 @@
 # AI-Assisted Development Report
+## Mandatory Assessment Deliverable — RSG GET Selection
 
 **Candidate Name:** Tharun Parsa  
-**Role:** Graduate Engineer Trainee (Python with Generative AI Engineer) — RSG  
+**Target Position:** Graduate Engineer Trainee (Python with Generative AI Engineer) — RSG  
 **Assessment:** AI-Assisted Development Challenge: Mini AI Business Intelligence Assistant  
 **Date:** October 2026  
 
@@ -99,7 +100,7 @@ Each issue was resolved using structured debugging methodologies:
   requests.get(f'https://generativelanguage.googleapis.com/v1beta/models?key={api_key}')
   ```
   Observed that `models/gemini-2.5-flash` returned HTTP 200 while `models/gemini-1.5-flash` returned HTTP 404.
-- **Resolution:** Updated default model to **`gemini-2.5-flash`** across [.env](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/.env), backend models, and frontend UI selectors.
+- **Resolution:** Updated default model to **`gemini-2.5-flash`** across `.env`, backend models, and frontend UI selectors.
 
 ### Handling Free Tier Rate Limits (5 RPM) with Zero Downtime
 - **Investigation:** Automated test runs making 2 LLM calls per query exceeded 5 RPM, producing HTTP 429 exceptions.
