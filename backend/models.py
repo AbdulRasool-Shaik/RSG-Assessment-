@@ -9,6 +9,8 @@ from pydantic import BaseModel, Field
 class QueryRequest(BaseModel):
     query: str = Field(..., description="Natural language question about sales data")
     use_llm: Optional[bool] = Field(True, description="Whether to attempt LLM agent before deterministic fallback")
+    api_key: Optional[str] = Field(None, description="Google AI Studio Gemini API Key passed dynamically from UI or client")
+    model: Optional[str] = Field("gemini-1.5-flash", description="Gemini model identifier")
 
 class MetricCard(BaseModel):
     label: str
@@ -34,6 +36,7 @@ class QueryResponse(BaseModel):
     metrics: List[MetricCard] = []
     chart: Optional[ChartData] = None
     engine_used: str = "deterministic_semantic_engine"
+    live_model: Optional[str] = None
     explanation: Optional[str] = None
     error_message: Optional[str] = None
 

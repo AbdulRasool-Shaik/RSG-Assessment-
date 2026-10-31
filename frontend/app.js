@@ -18,6 +18,124 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalCloseBtn = document.getElementById('modal-close-btn');
     const modalCloseOverlay = document.getElementById('modal-close-overlay');
 
+    // API Key Panel Elements
+    const apiKeyBtn = document.getElementById('api-key-btn');
+    const apiKeyPanel = document.getElementById('api-key-panel');
+    const closeApiPanel = document.getElementById('close-api-panel');
+    const geminiKeyInput = document.getElementById('gemini-key-input');
+    const toggleKeyVisibility = document.getElementById('toggle-key-visibility');
+    const geminiModelSelect = document.getElementById('gemini-model-select');
+    const verifyKeyBtn = document.getElementById('verify-key-btn');
+    const clearKeyBtn = document.getElementById('clear-key-btn');
+    const keyVerificationMsg = document.getElementById('key-verification-msg');
+    const apiKeyStatusText = document.getElementById('api-key-status-text');
+    const keyDot = document.getElementById('key-dot');
+
+    // 1. Initialize API Key from localStorage
+    initApiKey();
+
+    function initApiKey() {
+        const savedKey = localStorage.getItem('gemini_api_key');
+        const savedModel = localStorage.getItem('gemini_model');
+        if (savedModel && geminiModelSelect) {
+            geminiModelSelect.value = savedModel;
+        }
+
+        if (savedKey) {
+            geminiKeyInput.value = savedKey;
+            setKeyStatus(true, `🟢 Gemini Live (${savedModel || '1.5 Flash'})`);
+        } else {
+            setKeyStatus(false, 'Connect Gemini AI');
+        }
+    }
+
+    function setKeyStatus(isOnline, text) {
+        apiKeyStatusText.textContent = text;
+        if (isOnline) {
+            keyDot.className = 'key-status-dot online';
+            apiKeyBtn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+            apiKeyBtn.style.background = 'rgba(16, 185, 129, 0.1)';
+            apiKeyBtn.style.color = '#6ee7b7';
+        } else {
+            keyDot.className = 'key-status-dot offline';
+            apiKeyBtn.style.borderColor = 'rgba(59, 130, 246, 0.25)';
+            apiKeyBtn.style.background = 'rgba(59, 130, 246, 0.1)';
+            apiKeyBtn.style.color = '#93c5fd';
+        }
+    }
+
+    // Toggle API Key Panel
+    apiKeyBtn.addEventListener('click', () => {
+        apiKeyPanel.classList.toggle('hidden');
+    });
+
+    closeApiPanel.addEventListener('click', () => {
+        apiKeyPanel.classList.add('hidden');
+    });
+
+    // Toggle Password Visibility
+    toggleKeyVisibility.addEventListener('click', () => {
+        if (geminiKeyInput.type === 'password') {
+            geminiKeyInput.type = 'text';
+            toggleKeyVisibility.textContent = '🔒';
+        } else {
+            geminiKeyInput.type = 'password';
+            toggleKeyVisibility.textContent = '👁️';
+        }
+    });
+
+    // Verify & Connect API Key
+    verifyKeyBtn.addEventListener('click', async () => {
+        const key = geminiKeyInput.value.trim();
+        const model = geminiModelSelect.value;
+        if (!key) {
+            keyVerificationMsg.textContent = 'Please paste a valid Google AI Studio key.';
+            keyVerificationMsg.className = 'verification-msg error';
+            return;
+        }
+
+        verifyKeyBtn.disabled = true;
+        keyVerificationMsg.textContent = 'Verifying key with Google AI Studio...';
+        keyVerificationMsg.className = 'verification-msg';
+
+        try {
+            const res = await fetch('/api/verify-key', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ api_key: key })
+            });
+            const data = await res.json();
+
+            if (data.valid) {
+                localStorage.setItem('gemini_api_key', key);
+                localStorage.setItem('gemini_model', model);
+                keyVerificationMsg.textContent = `✓ ${data.message}`;
+                keyVerificationMsg.className = 'verification-msg success';
+                setKeyStatus(true, `🟢 Gemini Live (${model})`);
+                setTimeout(() => { apiKeyPanel.classList.add('hidden'); }, 1500);
+            } else {
+                keyVerificationMsg.textContent = `✗ ${data.message}`;
+                keyVerificationMsg.className = 'verification-msg error';
+                setKeyStatus(false, 'Invalid Key');
+            }
+        } catch (err) {
+            keyVerificationMsg.textContent = `Connection error: ${err.message}`;
+            keyVerificationMsg.className = 'verification-msg error';
+        } finally {
+            verifyKeyBtn.disabled = false;
+        }
+    });
+
+    // Clear Stored Key
+    clearKeyBtn.addEventListener('click', () => {
+        localStorage.removeItem('gemini_api_key');
+        localStorage.removeItem('gemini_model');
+        geminiKeyInput.value = '';
+        keyVerificationMsg.textContent = 'API key removed. Running in offline fallback mode.';
+        keyVerificationMsg.className = 'verification-msg';
+        setKeyStatus(false, 'Connect Gemini AI');
+    });
+
     // Handle Form Submit
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -59,11 +177,19 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoading(true);
         resultsSection.classList.add('hidden');
 
+        const activeKey = localStorage.getItem('gemini_api_key') || geminiKeyInput.value.trim();
+        const selectedModel = geminiModelSelect ? geminiModelSelect.value : 'gemini-1.5-flash';
+
         try {
             const res = await fetch('/api/query', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query: query, use_llm: true })
+                body: JSON.stringify({
+                    query: query,
+                    use_llm: true,
+                    api_key: activeKey || null,
+                    model: selectedModel
+                })
             });
 
             if (!res.ok) {
@@ -83,17 +209,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderResults(data) {
-        // Engine badge
-        const badge = document.getElementById('engine-badge');
-        badge.textContent = data.engine_used.replace(/_/g, ' ').toUpperCase();
-        if (data.status === 'refused') {
-            badge.style.background = 'rgba(239, 68, 68, 0.2)';
-            badge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
-            badge.style.color = '#fca5a5';
+        const engineBadge = document.getElementById('engine-badge');
+        const liveModelBadge = document.getElementById('live-model-badge');
+
+        // Check if processed by Live Gemini or Fallback
+        const isLive = data.live_model && !data.live_model.includes('None') && !data.live_model.includes('Failed');
+
+        if (isLive) {
+            engineBadge.textContent = 'AGENTIC VECTORLESS RAG';
+            engineBadge.style.background = 'rgba(59, 130, 246, 0.15)';
+            engineBadge.style.borderColor = 'rgba(59, 130, 246, 0.35)';
+            engineBadge.style.color = '#93c5fd';
+
+            liveModelBadge.textContent = `🟢 LIVE: ${data.live_model.replace('(Live)', '').trim()}`;
+            liveModelBadge.classList.remove('hidden');
         } else {
-            badge.style.background = 'rgba(59, 130, 246, 0.15)';
-            badge.style.borderColor = 'rgba(59, 130, 246, 0.3)';
-            badge.style.color = '#93c5fd';
+            engineBadge.textContent = 'DETERMINISTIC FALLBACK ENGINE';
+            engineBadge.style.background = 'rgba(245, 158, 11, 0.15)';
+            engineBadge.style.borderColor = 'rgba(245, 158, 11, 0.35)';
+            engineBadge.style.color = '#fcd34d';
+
+            liveModelBadge.textContent = 'OFFLINE (NO API KEY)';
+            liveModelBadge.style.background = 'rgba(107, 114, 128, 0.15)';
+            liveModelBadge.style.borderColor = 'rgba(107, 114, 128, 0.3)';
+            liveModelBadge.style.color = '#9ca3af';
+            liveModelBadge.classList.remove('hidden');
+        }
+
+        if (data.status === 'refused') {
+            engineBadge.textContent = 'GUARDRAIL BLOCKED';
+            engineBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+            engineBadge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+            engineBadge.style.color = '#fca5a5';
         }
 
         // Meta info
@@ -133,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // SQL Inspector
         document.getElementById('sql-code').textContent = data.sql_query || '-- No SQL query executed (Refused or Handled by Guardrail)';
-        document.getElementById('explanation-box').innerHTML = `<strong>Execution Logic:</strong> ${escapeHtml(data.explanation || 'Processed deterministically.')}`;
+        document.getElementById('explanation-box').innerHTML = `<strong>Reasoning & Logic:</strong> ${escapeHtml(data.explanation || 'Processed deterministically.')}`;
 
         // Table
         const tableCard = document.getElementById('table-card');
@@ -170,11 +317,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('chart-title').textContent = chartData.title || 'Data Visualization';
 
+        // Ensure datasets have nice background colors
+        const defaultColors = [
+            'rgba(59, 130, 246, 0.75)',
+            'rgba(16, 185, 129, 0.75)',
+            'rgba(245, 158, 11, 0.75)',
+            'rgba(139, 92, 246, 0.75)',
+            'rgba(239, 68, 68, 0.75)',
+            'rgba(14, 165, 233, 0.75)'
+        ];
+
+        const preparedDatasets = chartData.datasets.map((ds, idx) => {
+            if (!ds.backgroundColor) {
+                ds.backgroundColor = chartData.chart_type === 'doughnut' ? defaultColors : defaultColors[idx % defaultColors.length];
+            }
+            if (!ds.borderColor && chartData.chart_type !== 'doughnut') {
+                ds.borderColor = 'rgba(255, 255, 255, 0.2)';
+                ds.borderWidth = 1;
+            }
+            return ds;
+        });
+
         currentChart = new Chart(ctx, {
-            type: chartData.chart_type,
+            type: chartData.chart_type || 'bar',
             data: {
                 labels: chartData.labels,
-                datasets: chartData.datasets
+                datasets: preparedDatasets
             },
             options: {
                 responsive: true,
@@ -258,9 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Wrap list items
         html = html.replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>');
-        // Clean double wraps
         html = html.replace(/<\/ul>\s*<ul>/gim, '');
-        // Replace newlines with breaks if not in blocks
         html = html.replace(/\n\n/g, '<p></p>');
         return html;
     }

@@ -146,3 +146,13 @@ def test_out_of_domain_refusal():
     data = response.json()
     assert data["status"] == "refused"
     assert "Sales Business Intelligence Assistant" in data["answer"]
+
+def test_verify_api_key_endpoint():
+    """Verifies that the /api/verify-key endpoint correctly rejects empty and invalid keys."""
+    res_empty = client.post("/api/verify-key", json={"api_key": ""})
+    assert res_empty.status_code == 200
+    assert res_empty.json()["valid"] is False
+
+    res_fake = client.post("/api/verify-key", json={"api_key": "fake_test_key_12345"})
+    assert res_fake.status_code == 200
+    assert res_fake.json()["valid"] is False

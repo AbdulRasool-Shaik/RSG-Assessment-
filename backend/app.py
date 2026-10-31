@@ -5,6 +5,8 @@ and hosts the interactive web UI.
 """
 
 import os
+import requests
+from typing import Dict, Any, Optional
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -53,6 +55,7 @@ def handle_query(payload: QueryRequest):
     """
     Processes a natural language business question, validates SQL security,
     executes against SQLite, and returns a structured BI response.
+    Supports real-time Google Gemini via dynamic api_key or fallback.
     """
     if not payload.query or not payload.query.strip():
         raise HTTPException(
@@ -61,7 +64,12 @@ def handle_query(payload: QueryRequest):
         )
     
     try:
-        response = coordinator.execute(payload.query.strip(), prefer_llm=payload.use_llm)
+        response = coordinator.execute(
+            query=payload.query.strip(),
+            api_key=payload.api_key,
+            model_name=payload.model or "gemini-1.5-flash",
+            prefer_llm=payload.use_llm
+        )
         return response
     except SecurityValidationError as sec_err:
         return QueryResponse(
@@ -79,6 +87,22 @@ def handle_query(payload: QueryRequest):
             engine_used="error_handler",
             error_message=str(e)
         )
+
+@app.post("/api/verify-key", summary="Validate a Google AI Studio Gemini API Key")
+def verify_api_key(payload: Dict[str, str]):
+    """Verifies that a supplied Google AI Studio key is functional."""
+    key = payload.get("api_key", "").strip()
+    if not key:
+        return {"valid": False, "message": "API key cannot be empty."}
+    
+    try:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash?key={key}"
+        res = requests.get(url, timeout=5)
+        if res.status_code == 200:
+            return {"valid": True, "model": "gemini-1.5-flash", "message": "Google AI Studio API Key connected successfully!"}
+        return {"valid": False, "message": f"Google AI Studio rejected key (HTTP {res.status_code})."}
+    except Exception as e:
+        return {"valid": False, "message": f"Connection error: {str(e)}"}
 
 @app.get("/api/health", response_model=DataHealthResponse, summary="Get database health and ETL audit log")
 def get_health():

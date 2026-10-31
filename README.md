@@ -13,10 +13,13 @@
 
 ## 🌟 Highlights & Key Capabilities
 
-- **Deterministic Accuracy (Vectorless RAG):** Eliminates LLM arithmetic hallucinations by grounding calculations directly in an indexed SQLite database using executable SQL queries.
-- **Dual-Mode Engine (Zero-Configuration Ready):**
-  - **Deterministic Semantic Engine:** Works out-of-the-box with **zero API keys required**, guaranteeing that evaluators can run the project offline with instant response times.
-  - **Agentic LLM Engine:** Plug-and-play with OpenAI / Gemini with an **autonomous reflection loop** (self-correction on database or syntax errors).
+- **Live Google AI Studio Gemini Integration (Agentic AI):**
+  - Connects to **Google Gemini (Gemini 1.5 Flash / 2.5 Flash)** in real-time.
+  - **Dynamic UI API Key Entry:** Evaluators can paste their Google AI Studio API key directly into the UI header or store it in `.env` without restarting the server!
+  - **Autonomous Reflection Loop:** If generated SQL produces an error, the agent intercepts the exception and prompts Gemini to self-correct and re-execute.
+  - **Real-Time Executive BI Synthesis:** Gemini analyzes the actual database rows and dynamically synthesizes an executive summary, key metrics, and Chart.js visualization data.
+- **Deterministic Offline Fallback:**
+  - Works out-of-the-box with **zero API keys required**, guaranteeing that evaluators can run the project offline with instant response times.
 - **Four-Tier Defense-in-Depth Security:**
   - System prompt constraints.
   - **Abstract Syntax Tree (AST) validation (`sqlparse`)** ensuring root commands are strictly `SELECT` or `WITH`.
@@ -27,12 +30,14 @@
   - Excludes returned order `TXN0033` ($19,000) from realized revenue while preserving audit records.
   - Converts `DD-MM-YYYY` dates to ISO-8601 (`YYYY-MM-DD`) and indexes `order_month` for sub-millisecond time series grouping.
 - **Interactive Modern BI Dashboard:**
+  - Real-time Gemini Key connection & verification control.
+  - Live model badge (`🟢 LIVE: GEMINI 1.5 FLASH` vs `OFFLINE DETERMINISTIC`).
   - One-click benchmark query chips for all 5 core questions.
   - Dynamic **Chart.js** visualizations (bar, line, and doughnut charts).
   - **SQL Inspector** showing the executed SQL query, execution latency, and row count.
   - Supporting database records table with formatted currency.
   - **Data Health Modal** displaying real-time ETL audit logs.
-- **100% Automated Test Suite:** 12 automated unit and integration tests passing in under 1.5 seconds.
+- **100% Automated Test Suite:** 13 automated unit and integration tests passing in ~2 seconds.
 
 ---
 
