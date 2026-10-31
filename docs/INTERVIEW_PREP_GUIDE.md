@@ -30,7 +30,7 @@
 >
 > *Rather than building a basic LLM chatbot that hallucinates numbers, I implemented a **Vectorless RAG architecture**. The system converts natural language into validated SQLite queries using schema grounding. To ensure security, every query passes through a **four-tier defense-in-depth model**, including **AST token parsing with `sqlparse`**, blocking any destructive operations, and executing in a **read-only database URI sandbox**.*
 >
-> *I also designed an automated **ETL pipeline** that cleans edge cases like corrupted unit prices via catalog imputation and standardizes dates to ISO-8601. The solution features a high-performance **FastAPI backend**, an interactive UI with dynamic **Chart.js visualizations and an SQL Inspector**, and a **100% passing automated test suite** with 12 comprehensive unit and integration tests."*
+> *I also designed an automated **ETL pipeline** that cleans edge cases like corrupted unit prices via catalog imputation and standardizes dates to ISO-8601. The solution features a high-performance **FastAPI backend**, an interactive UI with dynamic **Chart.js visualizations and an SQL Inspector**, and a **100% passing automated test suite** with 16 comprehensive unit and integration tests."*
 
 ---
 

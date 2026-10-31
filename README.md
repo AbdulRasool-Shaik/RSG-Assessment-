@@ -4,7 +4,10 @@
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688.svg)](https://fastapi.tiangolo.com/)
 [![SQLite](https://img.shields.io/badge/SQLite-Read--Only%20Sandbox-003B57.svg)](https://www.sqlite.org/)
-[![Tests](https://img.shields.io/badge/Tests-12%20Passed%20(100%25)-brightgreen.svg)]()
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688.svg)](https://fastapi.tiangolo.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-Read--Only%20Sandbox-003B57.svg)](https://www.sqlite.org/)
+[![Tests](https://img.shields.io/badge/Tests-16%20Passed%20(100%25)-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/Assessment-RSG%20GET%20Selection-orange.svg)]()
 
 > A robust, deterministic Sales Business Intelligence Assistant built for the **AI-Assisted Development Challenge (Graduate Engineer Trainee Selection — RSG)**.
@@ -14,30 +17,31 @@
 ## 🌟 Highlights & Key Capabilities
 
 - **Live Google AI Studio Gemini Integration (Agentic AI):**
-  - Connects to **Google Gemini (Gemini 1.5 Flash / 2.5 Flash)** in real-time.
-  - **Dynamic UI API Key Entry:** Evaluators can paste their Google AI Studio API key directly into the UI header or store it in `.env` without restarting the server!
-  - **Autonomous Reflection Loop:** If generated SQL produces an error, the agent intercepts the exception and prompts Gemini to self-correct and re-execute.
-  - **Real-Time Executive BI Synthesis:** Gemini analyzes the actual database rows and dynamically synthesizes an executive summary, key metrics, and Chart.js visualization data.
+  - Connects to **Google Gemini (Gemini 2.5 Flash / Gemini Flash Latest / Gemini 2.5 Pro)** in real-time.
+  - **Dual API Key Support:** Configurable via backend `.env` file or directly through the interactive browser UI header.
+  - **Autonomous Reflection Loop:** Intercepts database exceptions or AST validation rejections and prompts Gemini to self-correct and re-execute.
+  - **Real-Time Executive BI Synthesis:** Automatically synthesizes natural language executive insights, metric cards, and Chart.js chart objects in structured JSON mode.
 - **Deterministic Offline Fallback:**
-  - Works out-of-the-box with **zero API keys required**, guaranteeing that evaluators can run the project offline with instant response times.
+  - Guaranteed zero-downtime offline fallback supporting all 5 benchmark questions, date variances, volume analytics, and channel breakdowns.
+  - Automatically activates if Google AI Studio Free Tier rate limits (5 RPM) or network disruptions occur.
 - **Four-Tier Defense-in-Depth Security:**
-  - System prompt constraints.
+  - System prompt constraints and schema grounding.
   - **Abstract Syntax Tree (AST) validation (`sqlparse`)** ensuring root commands are strictly `SELECT` or `WITH`.
-  - Mutation blocking (`DROP`, `DELETE`, `UPDATE`, `INSERT`, `ALTER`, `EXEC`) and semicolon query-stacking defense.
+  - Mutation blocking (`DROP`, `DELETE`, `UPDATE`, `INSERT`, `ALTER`, `EXEC`, `PRAGMA`) and semicolon query-stacking defense.
   - **Physical Read-Only Sandbox** (`file:sales_bi.db?mode=ro`).
 - **Forensic ETL Data Cleaning:**
   - Imputes corrupted row `TXN0051` (missing unit price) based on modal catalog price consistency ($1,200.00 for Laptop Stand).
-  - Excludes returned order `TXN0033` ($19,000) from realized revenue while preserving audit records.
-  - Converts `DD-MM-YYYY` dates to ISO-8601 (`YYYY-MM-DD`) and indexes `order_month` for sub-millisecond time series grouping.
+  - Excludes returned order `TXN0033` ($19,000) from realized revenue while preserving transactional audit records.
+  - Standardizes `DD-MM-YYYY` dates to ISO-8601 (`YYYY-MM-DD`) and indexes `order_month` for sub-millisecond time series grouping.
 - **Interactive Modern BI Dashboard:**
   - Real-time Gemini Key connection & verification control.
-  - Live model badge (`🟢 LIVE: GEMINI 1.5 FLASH` vs `OFFLINE DETERMINISTIC`).
+  - Live model badge (`🟢 LIVE: GEMINI 2.5 FLASH` vs `⚡ RATE LIMITED (FALLBACK)` vs `OFFLINE DETERMINISTIC`).
   - One-click benchmark query chips for all 5 core questions.
   - Dynamic **Chart.js** visualizations (bar, line, and doughnut charts).
   - **SQL Inspector** showing the executed SQL query, execution latency, and row count.
   - Supporting database records table with formatted currency.
   - **Data Health Modal** displaying real-time ETL audit logs.
-- **100% Automated Test Suite:** 13 automated unit and integration tests passing in ~2 seconds.
+- **100% Automated Test Suite:** 16 automated unit, integration, and security tests passing in ~2 seconds.
 
 ---
 
@@ -90,29 +94,42 @@
 pip install -r requirements.txt
 ```
 
-### 3. Run the Application
+### 3. (Optional) Configure Google AI Studio Key
+To enable real-time Live Gemini AI:
+- Copy `.env.example` to `.env`:
+  ```bash
+  cp .env.example .env
+  ```
+- Set your Google AI Studio API key in `.env`:
+  ```ini
+  GEMINI_API_KEY=your_google_ai_studio_api_key_here
+  GEMINI_MODEL=gemini-2.5-flash
+  ```
+*(Note: If no API key is provided, the application runs automatically in offline Deterministic Engine mode with zero failure.)*
+
+### 4. Run the Application
 ```bash
 python -m backend.app
 ```
 *The server will start at: `http://127.0.0.1:8000`*
 
-### 4. Open in Browser
+### 5. Open in Browser
 Visit **[http://127.0.0.1:8000](http://127.0.0.1:8000)** to interact with the dashboard.
 
-*(Optional) Interactive API documentation is available at **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**.*
+*(Interactive Swagger API documentation is available at **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**).*
 
 ---
 
 ## 🧪 Running Automated Tests
 
-Run the test suite using `pytest`:
+Run the full test suite using `pytest`:
 ```bash
 python -m pytest tests/test_assistant.py -v
 ```
 
 **Test Execution Summary:**
-- 12 passed in 1.46s (100% pass rate).
-- Validates all 5 core questions, data imputation of `TXN0051`, exclusion of returned order `TXN0033`, AST SQL injection defense, mutation blocking, and out-of-domain refusals.
+- **16 passed in ~2.0s (100% pass rate).**
+- Validates all 5 core questions, data imputation of `TXN0051`, exclusion of returned order `TXN0033`, zero quantity handling (`TXN0034`), AST SQL injection defense, mutation blocking, out-of-domain refusals, and system health endpoints.
 
 ---
 
@@ -132,9 +149,10 @@ python -m pytest tests/test_assistant.py -v
 
 | Document | Description |
 | :--- | :--- |
-| **[docs/INTERVIEW_PREP_GUIDE.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/docs/INTERVIEW_PREP_GUIDE.md)** | **Your Interview Playbook**: 60s elevator pitch, 3-min walkthrough, live demo script, and 25+ technical Q&As. |
-| **[docs/DECISIONS_LOG.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/docs/DECISIONS_LOG.md)** | **Architectural Decision Records (ADRs)**: Detailed justifications and trade-off analysis for all 9 key technical decisions. |
+| **[docs/SUBMISSION_PACKAGE.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/docs/SUBMISSION_PACKAGE.md)** | **Master Submission Package**: Executive summary, requirements compliance matrix, evaluator guide, and ground truth benchmarks. |
 | **[docs/AI_ASSISTED_DEVELOPMENT_REPORT.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/docs/AI_ASSISTED_DEVELOPMENT_REPORT.md)** | **Mandatory Assessment Deliverable**: Answers the 5 assessment questions regarding AI tools, debugging, and roadmap. |
+| **[docs/INTERVIEW_PREP_GUIDE.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/docs/INTERVIEW_PREP_GUIDE.md)** | **Your Interview Playbook**: 60s elevator pitch, 3-min walkthrough, live demo script, and 25+ technical Q&As. |
+| **[docs/DECISIONS_LOG.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/docs/DECISIONS_LOG.md)** | **Architectural Decision Records (ADRs)**: Detailed justifications and trade-off analysis for 10 key technical decisions. |
 | **[docs/ARCHITECTURE.md](file:///c:/Users/THARUN%20PARSA/Downloads/rsg/docs/ARCHITECTURE.md)** | **Technical Specification**: Mermaid diagrams, component boundaries, and security model. |
 
 ---
@@ -168,17 +186,33 @@ Executes natural language sales question.
 }
 ```
 
+### `GET /api/health`
+Returns database health status, column schema definitions, and the complete ETL data cleaning audit trail.
+
+### `GET /api/config`
+Returns backend configuration status, indicating whether a backend API key is active in `.env` and the default model.
+
+### `POST /api/verify-key`
+Validates whether a candidate Google AI Studio API key is functional against the Google GenAI ModelService.
+
+### `GET /api/sample-questions`
+Returns the 5 core challenge benchmark questions and analytical descriptions.
+
+---
+
 ## ⚠️ Known Limitations
 
 In compliance with the challenge documentation guidelines, the following known limitations and architectural boundaries of this prototype are documented:
 
-1. **Single-Table Analytical Scope:**
+1. **Google AI Studio Free Tier Rate Limits (5 RPM):**
+   - Free Tier API keys on Google AI Studio enforce a strict quota of 5 requests per minute (RPM). When multiple queries are fired in rapid succession, the application intercepts the HTTP 429 response and gracefully serves the query via the **Zero-Downtime Deterministic Fallback Engine** with complete data fidelity.
+2. **Single-Table Analytical Scope:**
    - The current SQLite database models a single denormalized analytical table (`sales`). While ideal for transactional sales reporting, an enterprise deployment would model snowflake schemas with normalized dimension tables (`customers`, `warehouses`, `promotions`).
-2. **Deterministic Offline Fallback Boundary:**
-   - The zero-API-key deterministic engine supports the 5 core benchmark questions, date variances, volume analytics, and category/channel breakdowns. Arbitrary or deeply nested ad-hoc questions (e.g., *"Calculate the median order value for online retail in Q1 excluding Mondays"*) require an active LLM API key (`OPENAI_API_KEY` or `GEMINI_API_KEY`) for dynamic Text-to-SQL compilation.
-3. **Language & Locale Localization:**
+3. **Deterministic Offline Fallback Boundary:**
+   - The zero-API-key deterministic engine supports the 5 core benchmark questions, date variances, volume analytics, and category/channel breakdowns. Arbitrary or deeply nested ad-hoc questions (e.g., *"Calculate the median order value for online retail in Q1 excluding Mondays"*) require an active LLM API key (`GEMINI_API_KEY`) for dynamic Text-to-SQL compilation.
+4. **Language & Locale Localization:**
    - Intent recognition and date-month parsing are currently localized for English (`January`–`June`, `Q1`, `Q2`). Multilingual support would require a multilingual semantic embedding layer.
-4. **OLAP Concurrency vs. Distributed Scale:**
+5. **OLAP Concurrency vs. Distributed Scale:**
    - SQLite with read-only connection sandboxing provides sub-2ms query latency for thousands of transactions. For petabyte-scale big data analytics, migrating to a columnar data warehouse like **ClickHouse**, **Snowflake**, or **Amazon Redshift** is recommended.
 
 ---
