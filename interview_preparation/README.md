@@ -1,7 +1,7 @@
 # Interview Preparation Directory
 ## Candidate Private Defense & Study Materials
 
-**Candidate:** Tharun Parsa  
+**Candidate:** Abdul Rasool  
 **Target Role:** Graduate Engineer Trainee (Python with Generative AI Engineer) — RSG  
 **Reporting Manager / Evaluator:** Jeevan Kumar, RSG, Hyderabad  
 

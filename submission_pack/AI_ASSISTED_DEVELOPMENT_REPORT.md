@@ -1,9 +1,9 @@
 # AI-Assisted Development Report
 ## Official Assessment Deliverable — Graduate Engineer Trainee Selection
 **Role:** Graduate Engineer Trainee (Python with Generative AI Engineer) — RSG  
-**Candidate Name:** Tharun Parsa  
+**Candidate Name:** Abdul Rasool  
 **Evaluator / Reporting Manager:** Jeevan Kumar, RSG, Hyderabad  
-**GitHub Repository:** [https://github.com/YOUR_GITHUB_USERNAME/mini-ai-bi-assistant](https://github.com/YOUR_GITHUB_USERNAME/mini-ai-bi-assistant) *(Update with your repository URL)*  
+**GitHub Repository:** [https://github.com/AbdulRasool-Shaik/RSG-Assessment-.git](https://github.com/AbdulRasool-Shaik/RSG-Assessment-.git)  
 **Date of Submission:** October 2026  
 
 ---
@@ -251,6 +251,6 @@ tests/test_assistant.py::test_config_endpoint PASSED                     [100%]
 
 This project demonstrates not only the potential of Generative AI in business intelligence, but more importantly, **how an engineer must steer, guard, and validate AI models** to achieve deterministic mathematical truth, strict security, and resilient production uptime.
 
-**Candidate:** Tharun Parsa  
+**Candidate:** Abdul Rasool  
 **Target Position:** Graduate Engineer Trainee (Python with Generative AI Engineer) — RSG  
 **Reporting Manager / Evaluator:** Jeevan Kumar, RSG, Hyderabad  

@@ -1,7 +1,7 @@
 # Core Technical Concepts Cheatsheet
 ## Deep-Dive Reference for Candidate Interview Defense
 
-**Candidate:** Tharun Parsa  
+**Candidate:** Abdul Rasool  
 **Role:** Graduate Engineer Trainee (Python with Generative AI Engineer) — RSG  
 **Reporting Manager / Evaluator:** Jeevan Kumar, RSG, Hyderabad  
 **Focus:** Generative AI, Agentic Workflows, Retrieval Architectures, Cloud Scaling  

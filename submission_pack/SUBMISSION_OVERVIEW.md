@@ -1,9 +1,10 @@
 # Official Candidate Submission Pack
 ## Mini AI Business Intelligence Assistant — GET Selection Assessment
 
-**Candidate Name:** Tharun Parsa  
+**Candidate Name:** Abdul Rasool  
 **Target Position:** Graduate Engineer Trainee (Python with Generative AI Engineer) — RSG  
 **Reporting Manager / Evaluator:** Jeevan Kumar, RSG  
+**GitHub Repository:** [https://github.com/AbdulRasool-Shaik/RSG-Assessment-.git](https://github.com/AbdulRasool-Shaik/RSG-Assessment-.git)  
 **Assessment Challenge:** AI-Assisted Development Challenge: Mini AI Business Intelligence Assistant  
 **Repository Branch:** `main`  
 **Submission Date:** October 2026  

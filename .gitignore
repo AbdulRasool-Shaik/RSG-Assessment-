@@ -7,3 +7,4 @@ venv/
 .venv/
 extracted_zip/
 *.log
+~$*.docx

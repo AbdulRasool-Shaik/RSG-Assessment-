@@ -10,7 +10,9 @@
 [![Tests](https://img.shields.io/badge/Tests-16%20Passed%20(100%25)-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/Assessment-RSG%20GET%20Selection-orange.svg)]()
 
-> A robust, deterministic Sales Business Intelligence Assistant built for the **AI-Assisted Development Challenge (Graduate Engineer Trainee Selection — RSG)**.
+> A robust, deterministic Sales Business Intelligence Assistant built for the **AI-Assisted Development Challenge (Graduate Engineer Trainee Selection — RSG)**.  
+> **Candidate:** Abdul Rasool | **Evaluator:** Jeevan Kumar, RSG, Hyderabad  
+> **GitHub Repository:** [https://github.com/AbdulRasool-Shaik/RSG-Assessment-.git](https://github.com/AbdulRasool-Shaik/RSG-Assessment-.git)  
 
 ---
 

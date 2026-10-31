@@ -1,6 +1,7 @@
 # Official Submission Pack — Mini AI Business Intelligence Assistant
-## Candidate: Tharun Parsa | Role: Graduate Engineer Trainee (Python with Generative AI Engineer) — RSG
+## Candidate: Abdul Rasool | Role: Graduate Engineer Trainee (Python with Generative AI Engineer) — RSG
 ## Reporting Manager / Evaluator: Jeevan Kumar, RSG, Hyderabad
+## GitHub Repository: [https://github.com/AbdulRasool-Shaik/RSG-Assessment-.git](https://github.com/AbdulRasool-Shaik/RSG-Assessment-.git)
 
 Welcome to the **Official Submission Pack** for the RSG GET Challenge. This directory contains all official assessment deliverables, reports, architecture diagrams, benchmark verifications, and compliance checklists.
 

@@ -1,7 +1,8 @@
 # Requirements Compliance Checklist
 ## Assessment Verification against `AI Assisted Development Challenge - GET.docx`
 
-**Candidate:** Tharun Parsa  
+**Candidate:** Abdul Rasool  
+**GitHub Repository:** [https://github.com/AbdulRasool-Shaik/RSG-Assessment-.git](https://github.com/AbdulRasool-Shaik/RSG-Assessment-.git)  
 **Assessment:** AI-Assisted Development Challenge: Mini AI Business Intelligence Assistant  
 **Evaluation Target:** Graduate Engineer Trainee (Python with Generative AI Engineer) — RSG  
 

@@ -1,7 +1,7 @@
 # Technical Interview Preparation Playbook
 ## Comprehensive Candidate Defense Guide — Mini AI Business Intelligence Assistant
 
-**Candidate Name:** Tharun Parsa  
+**Candidate Name:** Abdul Rasool  
 **Target Role:** Graduate Engineer Trainee (Python with Generative AI Engineer) — RSG  
 **Reporting Manager / Evaluator:** Jeevan Kumar, RSG, Hyderabad  
 **Core Technologies:** Agentic AI, Generative AI, Vectorless RAG, LangChain/LangGraph, Google ADK, Dify, Safe Text-to-SQL, SQLite Sandboxing, AST Guardrails, FastAPI, AWS Cloud  

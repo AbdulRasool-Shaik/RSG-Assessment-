@@ -1,7 +1,7 @@
 # Architectural Decision Records (ADR Log)
 
 **Project:** Mini AI Business Intelligence Assistant  
-**Candidate:** Tharun Parsa  
+**Candidate:** Abdul Rasool  
 **Target Role:** Graduate Engineer Trainee (Python with Generative AI Engineer) — RSG  
 **Reporting Manager / Evaluator:** Jeevan Kumar, RSG, Hyderabad  
 **Date:** October 2026  

@@ -1,7 +1,7 @@
 # Live Interview Demonstration Script & Presentation Checklist
 ## Screen-Sharing Walkthrough Guide for Interview Panel
 
-**Candidate:** Tharun Parsa  
+**Candidate:** Abdul Rasool  
 **Role:** Graduate Engineer Trainee (Python with Generative AI Engineer) — RSG  
 **Interviewer / Evaluator:** Jeevan Kumar, RSG, Hyderabad  
 **Duration:** ~10-15 Minutes Live Demo  
