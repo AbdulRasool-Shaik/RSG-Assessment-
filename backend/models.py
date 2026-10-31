@@ -10,7 +10,7 @@ class QueryRequest(BaseModel):
     query: str = Field(..., description="Natural language question about sales data")
     use_llm: Optional[bool] = Field(True, description="Whether to attempt LLM agent before deterministic fallback")
     api_key: Optional[str] = Field(None, description="Google AI Studio Gemini API Key passed dynamically from UI or client")
-    model: Optional[str] = Field("gemini-1.5-flash", description="Gemini model identifier")
+    model: Optional[str] = Field("gemini-2.5-flash", description="Gemini model identifier")
 
 class MetricCard(BaseModel):
     label: str

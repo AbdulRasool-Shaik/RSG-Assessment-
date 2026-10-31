@@ -45,33 +45,33 @@ class DeterministicEngine:
                 explanation="The request contained forbidden DDL/DML mutation keywords."
             )
 
-        # 1. Month-over-Month Comparison Query (Prioritized before generic month queries)
-        if self._matches_month_comparison(q):
-            return self._handle_month_comparison(query, q)
+        # 1. Sales Channel Breakdown
+        if 'channel' in q or 'online' in q or 'retail' in q:
+            return self._handle_channel_sales(query)
 
-        # 2. Regional Sales / Highest Region Query (Prioritized before generic revenue queries)
-        if self._matches_regional_sales(q):
-            return self._handle_regional_sales(query)
-
-        # 3. Monthly Revenue Trend Query
-        if self._matches_monthly_trend(q):
-            return self._handle_monthly_trend(query)
-
-        # 4. Product Revenue / Highest Product Query
-        if self._matches_product_revenue(q):
-            return self._handle_product_revenue(query, q)
-
-        # 5. Total Revenue Query
-        if self._matches_total_revenue(q):
-            return self._handle_total_revenue(query)
-
-        # 6. Category Breakdown
+        # 2. Category Breakdown
         if 'category' in q:
             return self._handle_category_sales(query)
 
-        # 7. Sales Channel Breakdown
-        if 'channel' in q or 'online' in q or 'retail' in q:
-            return self._handle_channel_sales(query)
+        # 3. Month-over-Month Comparison Query (Prioritized before generic month queries)
+        if self._matches_month_comparison(q):
+            return self._handle_month_comparison(query, q)
+
+        # 4. Regional Sales / Highest Region Query (Prioritized before generic revenue queries)
+        if self._matches_regional_sales(q):
+            return self._handle_regional_sales(query)
+
+        # 5. Monthly Revenue Trend Query
+        if self._matches_monthly_trend(q):
+            return self._handle_monthly_trend(query)
+
+        # 6. Product Revenue / Highest Product Query
+        if self._matches_product_revenue(q):
+            return self._handle_product_revenue(query, q)
+
+        # 7. Total Revenue Query
+        if self._matches_total_revenue(q):
+            return self._handle_total_revenue(query)
 
         # 8. Out of domain refusal
         return QueryResponse(
@@ -367,10 +367,13 @@ class DeterministicEngine:
         )
 
     def _matches_month_comparison(self, q: str) -> bool:
+        if any(term in q for term in ['channel', 'online', 'retail']) and 'month' not in q:
+            return False
         return (
-            'between' in q or 'change between' in q or 'compare' in q 
-            or 'growth' in q or 'vs' in q or 'versus' in q
-            or (('month' in q or 'monthly' in q) and any(m in q for m in ['change', 'diff', 'variance']))
+            'between two months' in q or 'between months' in q or 'change between' in q
+            or ('month' in q and any(w in q for w in ['compare', 'comparison', 'vs', 'versus', 'change', 'diff', 'variance', 'growth', 'between', 'two month']))
+            or (any(m in q for m in MONTH_MAP.keys()) and any(w in q for w in ['compare', 'vs', 'versus', 'to', 'between', 'change', 'diff']))
+            or 'two months' in q
         )
 
     def _handle_month_comparison(self, query: str, q: str) -> QueryResponse:
@@ -522,6 +525,12 @@ class DeterministicEngine:
             columns=cols,
             data=rows,
             metrics=[MetricCard(label=r['sales_channel'], value=f"${r['net_revenue']:,.2f}", subtitle=f"{r['order_count']} orders") for r in rows],
+            chart=ChartData(
+                chart_type="doughnut",
+                title="Revenue by Sales Channel",
+                labels=[r['sales_channel'] for r in rows],
+                datasets=[{"label": "Revenue ($)", "data": [r['net_revenue'] for r in rows]}]
+            ),
             engine_used="deterministic_semantic_engine",
             explanation="Aggregated revenue grouped by sales channel (Online vs Retail)."
         )

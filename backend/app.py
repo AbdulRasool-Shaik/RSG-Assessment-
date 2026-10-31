@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from dotenv import load_dotenv
+load_dotenv(override=True)
 
 from .etl import run_etl, DB_PATH, get_audit_log, RAW_CSV_PATH
 from .models import QueryRequest, QueryResponse, DataHealthResponse, AuditItem
@@ -64,10 +65,11 @@ def handle_query(payload: QueryRequest):
         )
     
     try:
+        active_model = payload.model or os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
         response = coordinator.execute(
             query=payload.query.strip(),
             api_key=payload.api_key,
-            model_name=payload.model or "gemini-1.5-flash",
+            model_name=active_model,
             prefer_llm=payload.use_llm
         )
         return response
@@ -96,10 +98,13 @@ def verify_api_key(payload: Dict[str, str]):
         return {"valid": False, "message": "API key cannot be empty."}
     
     try:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash?key={key}"
-        res = requests.get(url, timeout=5)
+        url = f"https://generativelanguage.googleapis.com/v1beta/models?key={key}"
+        res = requests.get(url, timeout=6)
         if res.status_code == 200:
-            return {"valid": True, "model": "gemini-1.5-flash", "message": "Google AI Studio API Key connected successfully!"}
+            models_data = res.json().get("models", [])
+            model_names = [m.get("name", "") for m in models_data]
+            active_m = "gemini-2.5-flash" if any("gemini-2.5-flash" in n for n in model_names) else "gemini-flash-latest"
+            return {"valid": True, "model": active_m, "message": f"Google AI Studio Key connected successfully ({active_m})!"}
         return {"valid": False, "message": f"Google AI Studio rejected key (HTTP {res.status_code})."}
     except Exception as e:
         return {"valid": False, "message": f"Connection error: {str(e)}"}
@@ -107,8 +112,9 @@ def verify_api_key(payload: Dict[str, str]):
 @app.get("/api/config", summary="Get backend AI configuration status")
 def get_config():
     """Returns backend configuration including whether GEMINI_API_KEY is active in .env."""
+    load_dotenv(override=True)
     has_key = bool(os.getenv("GEMINI_API_KEY", "").strip())
-    model = os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip()
+    model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip()
     return {
         "backend_has_key": has_key,
         "default_model": model,

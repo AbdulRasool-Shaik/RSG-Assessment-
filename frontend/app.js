@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (savedKey) {
             geminiKeyInput.value = savedKey;
-            setKeyStatus(true, `🟢 Gemini Live (${savedModel || '1.5 Flash'})`);
+            setKeyStatus(true, `🟢 Gemini Live (${savedModel || 'gemini-2.5-flash'})`);
             return;
         }
 
