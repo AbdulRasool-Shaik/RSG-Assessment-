@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini AI Business Intelligence Assistant</title>
+    <meta name="description" content="Vectorless RAG and Agentic Text-to-SQL Assistant for Sales Intelligence">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Navigation / Header -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="logo-badge">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="app-title">Sales BI Assistant</h1>
+                    <p class="app-subtitle">Vectorless RAG • AST-Validated Text-to-SQL • Deterministic Intelligence</p>
+                </div>
+            </div>
+            <div class="header-status">
+                <div class="status-indicator">
+                    <span class="pulse-dot"></span>
+                    <span id="connection-status">SQLite Read-Only Active</span>
+                </div>
+                <button id="health-btn" class="btn-secondary" title="View ETL Audit & Database Health">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                    </svg>
+                    Data Health
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Hero Question Prompt Section -->
+            <section class="search-section">
+                <div class="search-box-wrapper">
+                    <form id="query-form" class="query-form">
+                        <div class="input-container">
+                            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <input 
+                                type="text" 
+                                id="query-input" 
+                                placeholder="Ask any sales question... (e.g., What is the total revenue?)"
+                                autocomplete="off"
+                                required
+                            />
+                            <button type="submit" id="submit-btn" class="btn-primary">
+                                <span class="btn-text">Analyze</span>
+                                <div class="spinner hidden" id="loading-spinner"></div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Suggested Query Chips -->
+                <div class="chips-container">
+                    <span class="chips-label">Benchmark Queries:</span>
+                    <div class="chips-list">
+                        <button class="chip" data-query="What is the total revenue?">Total Revenue</button>
+                        <button class="chip" data-query="Which product generated the highest revenue?">Top Product</button>
+                        <button class="chip" data-query="What is the monthly revenue trend?">Monthly Trend</button>
+                        <button class="chip" data-query="Which region generated the highest sales?">Top Region</button>
+                        <button class="chip" data-query="How did revenue change between two months?">Month Comparison</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results-section" class="results-section hidden">
+                <!-- Answer Card -->
+                <div class="card answer-card">
+                    <div class="card-header">
+                        <div class="card-badge">
+                            <span id="engine-badge" class="badge">Deterministic Engine</span>
+                        </div>
+                        <div class="exec-meta">
+                            <span id="exec-time">0.0 ms</span>
+                            <span class="separator">•</span>
+                            <span id="row-count">0 rows</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="answer-content" class="markdown-body"></div>
+                    </div>
+                </div>
+
+                <!-- Key Metrics Grid -->
+                <div id="metrics-grid" class="metrics-grid hidden"></div>
+
+                <!-- Visualization Card -->
+                <div id="chart-card" class="card chart-card hidden">
+                    <div class="card-header">
+                        <h3 id="chart-title" class="card-title">Analytics Visualization</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="analytics-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- SQL Inspector & Supporting Data Accordion -->
+                <div class="card inspector-card">
+                    <div class="inspector-header" id="inspector-toggle">
+                        <div class="inspector-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="16 18 22 12 16 6"></polyline>
+                                <polyline points="8 6 2 12 8 18"></polyline>
+                            </svg>
+                            <span>SQL Inspector & AST Safety Verification</span>
+                        </div>
+                        <span class="toggle-icon" id="inspector-icon">▼</span>
+                    </div>
+                    <div class="inspector-content" id="inspector-content">
+                        <div class="sql-code-block">
+                            <div class="code-header">
+                                <span>EXECUTED SQL (READ-ONLY SANDBOX)</span>
+                                <button id="copy-sql-btn" class="btn-copy">Copy SQL</button>
+                            </div>
+                            <pre><code id="sql-code">-- SQL query will appear here</code></pre>
+                        </div>
+                        <div class="explanation-box" id="explanation-box"></div>
+                    </div>
+                </div>
+
+                <!-- Supporting Figures Table -->
+                <div class="card table-card" id="table-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Supporting Database Records</h3>
+                        <span class="table-subtitle">Deterministic figures retrieved directly from SQLite</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="supporting-table">
+                            <thead>
+                                <tr id="table-head-row"></tr>
+                            </thead>
+                            <tbody id="table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Data Health Modal -->
+        <div id="health-modal" class="modal hidden">
+            <div class="modal-overlay" id="modal-close-overlay"></div>
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2>Data Health & ETL Forensic Audit</h2>
+                    <button id="modal-close-btn" class="btn-close">&times;</button>
+                </div>
+                <div class="modal-body" id="health-modal-body">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Built for the <strong>AI-Assisted Development Challenge</strong> • Graduate Engineer Trainee Selection</p>
+            <p class="footer-subtext">Powered by Vectorless RAG, AST Security Sandboxing, and SQLite</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
